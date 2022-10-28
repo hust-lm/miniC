@@ -4,19 +4,98 @@
 /* 提示：因为是顺序匹配，即从上至下依次匹配规则，所以需要合理安排顺序～ */
 %{
 #include <stdio.h>
-%} /*** begin ****/
+%}
+/*** begin ****/
 
 INTCON			[\-]?[1-9][0-9]*|0
 IDENT			[A-Za-z][A-Za-z0-9]*
-
- 
-
+CHARCON \'[^']*\'
+PLUS    \+
+MINUS   \-
+TIMES   \*
+DIVSYM  \/
+EQL     \=
+NEQ     \<\>
+LEQ     \<\=
+GEQ     \>\=
+LSS     \<
+GTR     \>
+OFSYM   of
+ARRAYSYM array
+PROGRAMSYM program
+MODSYM mod
+ANDSYM and
+ORSYM or
+NOTSYM not
+LBRACK  \[
+RBRACK  \]
+LPAREN  \(
+RPAREN  \)
+COMMA   \,
+SEMICOLON \;
+PERIOD  \.
+BECOME  \:\=
+COLON   \:
+BEGINSYM begin
+ENDSYM  end
+IFSYM   if
+THENSYM then
+ELSESYM else
+WHILESYM while
+DOSYM   do
+CALLSYM call
+CONSTSYM const
+TYPESYM type
+VARSYM  var
+PROCSYM procedure
+ERROR   [~!@#$%^&_\\]
 
 %%  
-
 {INTCON}		{printf("%s: INTCON\n", yytext);}
-{IDENT}			{printf("%s: IDENT\n", yytext);}
 
+{CHARCON}		{printf("%s: CHARCON\n", yytext);}
+{PLUS}			{printf("%s: PLUS\n", yytext);}
+{MINUS}			{printf("%s: MINUS\n", yytext);}
+{TIMES}			{printf("%s: TIMES\n", yytext);}
+{DIVSYM}		{printf("%s: DIVSYM\n", yytext);}
+{EQL}			{printf("%s: EQL\n", yytext);}
+{NEQ}			{printf("%s: NEQ\n", yytext);}
+{LEQ}			{printf("%s: LEQ\n", yytext);}
+{GEQ}			{printf("%s: GEQ\n", yytext);}
+{LSS}			{printf("%s: LSS\n", yytext);}
+{GTR}			{printf("%s: GTR\n", yytext);}
+
+{OFSYM}			{printf("%s: OFSYM\n", yytext);}
+{ARRAYSYM}		{printf("%s: ARRAYSYM\n", yytext);}
+{PROGRAMSYM}	{printf("%s: PROGRAMSYM\n", yytext);}
+{MODSYM}		{printf("%s: MODSYM\n", yytext);}
+{ANDSYM}		{printf("%s: ANDSYM\n", yytext);}
+{ORSYM}			{printf("%s: ORSYM\n", yytext);}
+{NOTSYM}		{printf("%s: NOTSYM\n", yytext);}
+
+{LBRACK}		{printf("%s: LBRACK\n", yytext);}
+{RBRACK}		{printf("%s: RBRACK\n", yytext);}
+{LPAREN}		{printf("%s: LPAREN\n", yytext);}
+{RPAREN}		{printf("%s: RPAREN\n", yytext);}
+{COMMA}			{printf("%s: COMMA\n", yytext);}
+{SEMICOLON}		{printf("%s: SEMICOLON\n", yytext);}
+{PERIOD}		{printf("%s: PERIOD\n", yytext);}
+{BECOME}		{printf("%s: BECOME\n", yytext);}
+{COLON}			{printf("%s: COLON\n", yytext);}
+{BEGINSYM}		{printf("%s: BEGINSYM\n", yytext);}
+{ENDSYM}		{printf("%s: ENDSYM\n", yytext);}
+{IFSYM}			{printf("%s: IFSYM\n", yytext);}
+{THENSYM}		{printf("%s: THENSYM\n", yytext);}
+{ELSESYM}		{printf("%s: ELSESYM\n", yytext);}
+{WHILESYM}		{printf("%s: WHILESYM\n", yytext);}
+{DOSYM}			{printf("%s: DOSYM\n", yytext);}
+{CALLSYM}		{printf("%s: CALLSYM\n", yytext);}
+{CONSTSYM}		{printf("%s: CONSTSYM\n", yytext);}
+{TYPESYM}		{printf("%s: TYPESYM\n", yytext);}
+{VARSYM}		{printf("%s: VARSYM\n", yytext);}
+{PROCSYM}		{printf("%s: PROCSYM\n", yytext);}
+{IDENT}			{printf("%s: IDENT\n", yytext);}
+{ERROR}			{printf("%s: ERROR\n", yytext);}
  
 
 
