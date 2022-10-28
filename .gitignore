@@ -1,0 +1,5 @@
+.vscode
+*.c
+error.txt
+result.txt
+scanner
