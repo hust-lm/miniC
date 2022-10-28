@@ -23,13 +23,15 @@ void yyerror(char const *);
 calclist:
 	%empty
 	|calclist exp EOL {printf("=%.10g\n",$2);}
-exp:term
-	;
-
-term:NUM
-	;
-
-
+exp:
+	term
+    | exp ADD term { $$ = $1 + $3; }
+    | exp SUB term { $$ = $1 - $3; }
+term:
+ 	NUM             { $$ = $1;      }
+	| term MUL term { $$ = $1 * $3; }
+    | term DIV term { $$ = $1 / $3; } 
+ ;
 
  /* end */
 %%
