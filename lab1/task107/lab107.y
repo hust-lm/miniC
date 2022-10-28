@@ -47,7 +47,15 @@ exp:term
 	|error {}
 	;
 
-term:NUM
+term:factor
+	| term MUL term  { $$ = $1 * $3;      }
+    | term DIV term  { $$ = $1 / $3;      }
+    | term EXPO term   { $$ = pow($1, $3);  }
+	;
+
+factor:
+    NUM                 { $$ = $1;          }
+	| SUB factor        { $$ = -$2;         }
 	;
 %%
 

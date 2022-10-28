@@ -4,4 +4,4 @@ scanner:lab107.y
 	gcc -o scanner lab107.tab.c lex.yy.c -lm -lfl
 .PHONY:clean
 clean:
-	rm scanner lab107.tab.c lex.yy.c lab107.tab.h
+	rm -f scanner lab107.tab.c lex.yy.c lab107.tab.h result.txt error.txt
