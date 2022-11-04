@@ -43,6 +43,11 @@ floatvar ([0-9]*\.[0-9]+|[0-9]+\.)((E|e)[\+\-]?[0-9]+)?
 [.] {flexout("DOT",yytext);}
 [!] {flexout("NOT",yytext);}
 
+(\+\+) {flexout("PLUSPLUS",yytext);}
+(\-\-) {flexout("MINUSMINUS",yytext);}
+(\+\=) {flexout("PLUSASS",yytext);}
+(\-\=) {flexout("MINUSASS",yytext);}
+
 [\<] {flexout("LT",yytext);}
 [\>] {flexout("GT",yytext);}
 [\(] {flexout("LP",yytext);}
