@@ -23,11 +23,42 @@ void flexout(std::string name,std::string value){
 "int"        {flexout("TYPE","int");}
 "float"      {flexout("TYPE","float");}
 "char"      {flexout("TYPE","char");}
+[\-]?[1-9][0-9]*|0 {flexout("INT",yytext);}
+[0-9]*\.[0-9]+ {flexout("FLOAT",yytext);}
+[A-Za-z][A-Za-z0-9]* {flexout("ID",yytext);}
+[;] {flexout("SEMI",yytext);}
+[,] {flexout("COMMA",yytext);}
+[=] {flexout("ASSIGNOP",yytext);}
+[\+] {flexout("PLUS",yytext);}
+[\-] {flexout("MINUS",yytext);}
+[\*] {flexout("STAR",yytext);}
+[\/] {flexout("DIV",yytext);}
+[&&] {flexout("AND",yytext);}
+[||] {flexout("OR",yytext);}
+[.] {flexout("DOT",yytext);}
+[!] {flexout("NOT",yytext);}
+
+[\<] {flexout("LT",yytext);}
+[\>] {flexout("GT",yytext);}
+[\(] {flexout("LP",yytext);}
+[\)] {flexout("RP",yytext);}
+[\{] {flexout("LC",yytext);}
+[\}] {flexout("RC",yytext);}
+[\[] {flexout("LB",yytext);}
+[\]] {flexout("RB",yytext);}
+"struct" {flexout("STRUCT",yytext);}
+"return" {flexout("RETURN",yytext);}
+"if" {flexout("IF",yytext);}
+"else" {flexout("ELSE",yytext);}
+"while" {flexout("WHILE",yytext);}
 
 
 [\n]		{yycolumn=1;}
 [ \r\t]		{/*printf("过滤空格等字符\n");*/}
 
+. {
+	printf("Error type A at Line %d: Mysterious characters \'%s\'\n", yylineno, yytext);
+}
 %%
 
 int yywrap()
