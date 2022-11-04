@@ -7,3 +7,4 @@ scanner
 minic
 token.cpp
 tokens.txt
+*.output
