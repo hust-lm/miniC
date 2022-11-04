@@ -1,5 +1,8 @@
 .vscode
 *.c
+*.o
 error.txt
 result.txt
 scanner
+minic
+token.cpp
