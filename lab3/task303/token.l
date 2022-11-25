@@ -17,6 +17,8 @@ void flexout(std::string name,std::string value){
   std::cout<<name<<"\t:"<<value<<std::endl;
 }
 //flex为bison提供行号信息
+//删除了 "%="		 {return MODASS;/*模运算可能后期有点难，先不支持*/}
+//删除了 "%"			 {return MOD;}
 %}
 %option yylineno 
 
@@ -50,7 +52,6 @@ float  ([0-9]*\.[0-9]+)|([0-9]+\.)|([0-9]*\.[0-9]+e(-)?[0-9]+)
 "-="		 {return MINUSASS;}
 "*="		 {return STARASS;}
 "/="		 {return DIVASS;}
-"%="		 {return MODASS;/*模运算可能后期有点难，先不支持*/}
 
 "++"		 {return PLUSPLUS;}
 "--" 		 {return MINUSMINUS;}
@@ -59,7 +60,6 @@ float  ([0-9]*\.[0-9]+)|([0-9]+\.)|([0-9]*\.[0-9]+e(-)?[0-9]+)
 "-"			 {return MINUS;}
 "*"			 {return STAR;}
 "/"			 {return DIV;}
-"%"			 {return MOD;}
 "&&"         {return AND;}
 "||"		 {return OR;}
 "!"			 {return NOT;}
