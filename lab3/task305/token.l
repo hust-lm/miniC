@@ -57,7 +57,7 @@ float ([0-9]*\.[0-9]+)|([0-9]+\.)|([0-9]*\.[0-9]+e(-)?[0-9]+)
 "else"       {yylval.line = yylineno;return ELSE;}
 "while"      {yylval.line = yylineno;return WHILE;}
 "break"		{yylval.line = yylineno;return BREAK;}
-{id}       {strcpy(yylval.type_id,  yytext); return ID;/*由于关键字的形式也符合表示符的规则，所以把关键字的处理全部放在标识符的前面，优先识别*/}
+{id}       {sprintf(yylval.type_id, "%s%c%d", yytext, 0, yylineno); return ID;/*由于关键字的形式也符合表示符的规则，所以把关键字的处理全部放在标识符的前面，优先识别*/}
 
 ";"			{yylval.line = yylineno;return SEMI;}
 ","			{yylval.line = yylineno;return COMMA;}
@@ -124,5 +124,5 @@ int main(int argc,char **argv)
 
 int yywrap()
 {
-return 1;
+    return 1;
 }
