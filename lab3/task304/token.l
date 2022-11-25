@@ -28,6 +28,8 @@ void flexout(std::string name,std::string value){
   std::cout<<name<<"\t:"<<value<<std::endl;
 }
 //flex为bison提供行号信息
+//删除了 "%="		 {return MODASS;/*模运算可能后期有点难，先不支持*/}
+//删除了 "%"			 {return MOD;}
 %}
 %option yylineno 
 
@@ -67,8 +69,6 @@ float ([0-9]*\.[0-9]+)|([0-9]+\.)|([0-9]*\.[0-9]+e(-)?[0-9]+)
 "-="		{yylval.line = yylineno;return MINUSASS;}
 "*="		{yylval.line = yylineno;return STARASS;}
 "/="		{yylval.line = yylineno;return DIVASS;}
-"%="		{yylval.line = yylineno;return MODASS;/*模运算可能后期有点难，先不支持*/}
-
 "++"		{yylval.line = yylineno;return PLUSPLUS;}
 "--" 		{yylval.line = yylineno;return MINUSMINUS;}
 
@@ -76,7 +76,6 @@ float ([0-9]*\.[0-9]+)|([0-9]+\.)|([0-9]*\.[0-9]+e(-)?[0-9]+)
 "-"			{yylval.line = yylineno;return MINUS;}
 "*"			{yylval.line = yylineno;return STAR;}
 "/"			{yylval.line = yylineno;return DIV;}
-"%"			{yylval.line = yylineno;return MOD;}
 "&&"        {yylval.line = yylineno;return AND;}
 "||"		{yylval.line = yylineno;return OR;}
 "!"			{yylval.line = yylineno;return NOT;}

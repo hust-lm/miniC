@@ -103,115 +103,131 @@ extern int yylex(void);
 
 %%
 /*High-level Definitions*/
-program: ExtDefList {p=new NProgram($1);if($1) p->line=$1->line;} /*显示语法树*/
-        ;
-ExtDefList: {  $$=nullptr;}
-        | ExtDef ExtDefList {$$=new NExtDefList(*$1,$2); $$->line=$1->line;}
-        ;
-ExtDef: Specifier ExtDecList SEMI {}
-        | Specifier SEMI {} 
-        | Specifier FunDec CompSt {}
-        ;
-ExtDecList: VarDec {}
-        | VarDec COMMA ExtDecList {}
-        ;
+program:
+    ExtDefList                  { p = new NProgram($1); if($1) p->line = $1->line; } /*显示语法树*/
+    ;
+ExtDefList:
+    %empty                      { $$ = nullptr; }
+    | ExtDef ExtDefList         { $$ = new NExtDefList(*$1, $2); $$->line = $1->line; }
+    ;
+ExtDef: 
+    Specifier ExtDecList SEMI   { $$ = new NExtDef(*$1, $2); $$->line = $1->line; }
+    | Specifier SEMI            { $$ = new NExtDef(*$1); $$->line = $1->line; } 
+    | Specifier FunDec CompSt   { $$ = new NExtDef(*$1, $2, $3); $$->line = $1->line; }
+    ;
+ExtDecList: 
+    VarDec                      { $$ = new NExtDecList(*$1, nullptr); $$->line = $1->line; }
+    | VarDec COMMA ExtDecList   { $$ = new NExtDecList(*$1, $3); $$->line = $1->line; }
+    ;
 
 /*Specifiers*/
-Specifier: TYPE {}   
-        | StructSpecifier {}   
-        ;
-
-StructSpecifier: STRUCT OptTag LC DefList RC {}   
-        | STRUCT Tag {}   
-        ;
-
-OptTag: ID {}   
-        | {}   
-        ;
-
-Tag: ID {}   
-        ;
+Specifier: 
+    TYPE                        { if ($1[0] == 'i') $$ = new NSpecifier(*(new std::string("int")));
+                                else $$ = new NSpecifier(*(new std::string("float"))); $$->line = yylineno; }   
+    | StructSpecifier           { $$ = new NSpecifier(); $$->line = $1->line; }
+    ;
+StructSpecifier: 
+    STRUCT OptTag LC DefList RC { $$ = new NStructSpecifier($2, $4); $$->line = $1; }   
+    | STRUCT Tag                { $$ = new NStructSpecifier($2); $$->line = $1; }   
+    ;
+OptTag: 
+    ID                          { $$ = new NIdentifier($1); $$->line = yylineno; }   
+    | %empty                    { $$ = nullptr; }   
+    ;
+Tag:
+    ID                          { $$ = new NIdentifier($1); $$->line = yylineno; }   
+    ;
 
 /*Declarators*/
-VarDec:  ID {}   //ID结点，标识符符号串存放结点的type_id
-        | VarDec LB INT RB {}
-        ;
-FunDec: ID LP VarList RP {}
-        | ID LP RP {}
-        ;
-VarList: ParamDec {}
-        | ParamDec COMMA VarList {}
-        ;
-ParamDec: Specifier VarDec {}
-        ;
+VarDec:
+    ID                          { $$ = new NVarDec(*(new NIdentifier($1))); $$->line = yylineno; }
+    | VarDec LB INT RB          { /* ? */ $$->line = $1->line; }
+    ;
+FunDec: 
+    ID LP VarList RP            { $$ = new NFunDec(*(new NIdentifier($1)), $3); $$->line = yylineno; }
+    | ID LP RP                  { $$ = new NFunDec(*(new NIdentifier($1)), nullptr); $$->line = yylineno; }
+    ;
+VarList: 
+    ParamDec                    { $$ = new NVarList(*$1, nullptr); $$->line = $1->line; }
+    | ParamDec COMMA VarList    { $$ = new NVarList(*$1, $3); $$->line = $1->line; }
+    ;
+ParamDec: 
+    Specifier VarDec            { $$ = new NParamDec(*$1, *$2); $$->line = $1->line; }
+    ;
 
 /*Statements*/
-CompSt:   LC DefList StmtList RC {}
-        ;
-StmtList: {}  
-        | Stmt StmtList  {}
-        ;
-Stmt:     Exp SEMI {}
-        | CompSt {}      //复合语句结点直接最为语句结点，不再生成新的结点
-        | RETURN Exp SEMI {}
-        | IF LP Exp RP Stmt %prec LOWER_THEN_ELSE   {}
-        | IF LP Exp RP Stmt ELSE Stmt {}
-        | WHILE LP Exp RP Stmt {}
-        | BREAK SEMI {}
-        ;
+CompSt:
+    LC DefList StmtList RC      { $$ = new NCompSt($2, $3); $$->line = $1; }
+    ;
+StmtList:
+    %empty                      { $$ = nullptr; }  
+    | Stmt StmtList             { $$ = new NStmtList(*$1, $2); $$->line = $1->line; }
+    ;
+Stmt:
+    Exp SEMI                    { $$ = new NExpStmt(*$1); $$->line = $1->line; }
+    | CompSt                    { $$ = new NStmt(); $$->line = $1->line; }      //复合语句结点直接作为语句结点，不再生成新的结点
+    | RETURN Exp SEMI           { $$ = new NRetutnStmt(*$2); $$->line = $1; }
+    | IF LP Exp RP Stmt %prec LOWER_THEN_ELSE   { $$ = new NIfStmt(*$3, *$5); $$->line = $1; }
+    | IF LP Exp RP Stmt ELSE Stmt   { $$ = new NIfElseStmt(*$3, *$5, *$7); $$->line = $1; }
+    | WHILE LP Exp RP Stmt      { $$ = new NWhileStmt(*$3, *$5); $$->line = $1; }
+    | BREAK SEMI                { $$ = new NBreakStmt(); $$->line = $1; }
+    ;
 
 /*Local Definitions*/
-DefList: {}
-        | Def DefList {}
-        ;
-Def: Specifier DecList SEMI {}
-        ;
-
-DecList:  Dec  {}
-        | Dec COMMA DecList  {}
-        ;
-Dec:      VarDec  {}
-        | VarDec ASSIGNOP Exp  {}
-        ;
+DefList:
+    %empty                      { $$ = nullptr; }
+    | Def DefList               { $$ = new NDefList(*$1, $2); $$->line = $1->line; }
+    ;
+Def:
+    Specifier DecList SEMI      { $$ = new NDef(*$1, $2); $$->line = $1->line; }
+    ;
+DecList:
+    Dec                         { $$ = new NDecList(*$1, nullptr); $$->line = $1->line; }
+    | Dec COMMA DecList         { $$ = new NDecList(*$1, $3); $$->line = $1->line; }
+    ;
+Dec:
+    VarDec                      { $$ = new NDec(*$1); $$->line = $1->line; }
+    | VarDec ASSIGNOP Exp       { $$ = new NDec(*$1, $3); $$->line = $1->line; }
+    ;
 
 /*Expressions*/
-Exp:      Exp ASSIGNOP Exp {}//$$结点type_id空置未用，正好存放运算符
-        
-        | Exp PLUSASS Exp   {}//复合赋值运算
-        | Exp MINUSASS Exp   {}
-        | Exp STARASS Exp   {}
-        | Exp DIVASS Exp   {}
+Exp:                                // $$结点type_id空置未用，正好存放运算符
+    Exp ASSIGNOP Exp            { $$ = new NAssignment(*(new std::string("ASSIGNOP")), *$1, ASSIGNOP, *$3); $$->line = $1->line; }
+    | Exp PLUSASS Exp           { $$ = new NAssignment(*(new std::string("PLUSASS")), *$1, PLUSASS, *$3); $$->line = $1->line; }
+    | Exp MINUSASS Exp          { $$ = new NAssignment(*(new std::string("MINUSASS")), *$1, MINUSASS, *$3); $$->line = $1->line; }
+    | Exp STARASS Exp           { $$ = new NAssignment(*(new std::string("STARASS")), *$1, STARASS, *$3); $$->line = $1->line; }
+    | Exp DIVASS Exp            { $$ = new NAssignment(*(new std::string("DIVASS")), *$1, DIVASS, *$3); $$->line = $1->line; }
+                                    // BISON %prec表示和UMINUS同优先级
+    | PLUSPLUS Exp %prec UPLUSPLUS      { $$ = new NSingleOperator(*(new std::string("UPLUSPLUS")), UPLUSPLUS, *$2); $$->line = $1; }
+    | MINUSMINUS Exp %prec UMINUSMINUS  { $$ = new NSingleOperator(*(new std::string("UMINUSMINUS")), UMINUSMINUS, *$2); $$->line = $1; }
+    | Exp PLUSPLUS                      { $$ = new NSingleOperator(*(new std::string("PLUSPLUS")), PLUSASS, *$1); $$->line = $1->line; }
+    | Exp MINUSMINUS                    { $$ = new NSingleOperator(*(new std::string("MINUSMINUS")), PLUSASS, *$1); $$->line = $1->line; }
+    | Exp AND Exp               { $$ = new NBinaryOperator(*(new std::string("AND")), *$1, AND, *$3); $$->line = $1->line; }
+    | Exp OR Exp                { $$ = new NBinaryOperator(*(new std::string("OR")), *$1, OR, *$3); $$->line = $1->line; }
+                                    //词法分析关系运算符号自身值保存在$2中
+    | Exp RELOP Exp             { $$ = new NBinaryOperator($2, *$1, RELOP, *$3); $$->line = $1->line; } 
+    | Exp PLUS Exp              { $$ = new NBinaryOperator(*(new std::string("PLUS")), *$1, PLUS, *$3); $$->line = $1->line; }
+    | Exp MINUS Exp             { $$ = new NBinaryOperator(*(new std::string("MINUS")), *$1, MINUS, *$3); $$->line = $1->line; }
+    | Exp STAR Exp              { $$ = new NBinaryOperator(*(new std::string("STAR")), *$1, STAR, *$3); $$->line = $1->line; }
+    | Exp DIV Exp               { $$ = new NBinaryOperator(*(new std::string("DIV")), *$1, DIV, *$3); $$->line = $1->line; }
+    | LP Exp RP                 { $$ = new NParenOperator(*$2); $$->line = $1; }
+                                    // BISON %prec表示和UMINUS同优先级
+    | MINUS Exp %prec UMINUS    { $$ = new NSingleOperator(*(new std::string("UMINUS")), UMINUS, *$2); $$->line = $1; }
+    | NOT Exp                   { $$ = new NSingleOperator(*(new std::string("NOT")), NOT, *$2); $$->line = $1; }
+    | ID LP Args RP             { $$ = new NMethodCall(*(new NIdentifier($1)), $3); $$->line = yylineno; }
+    | ID LP RP                  { $$ = new NMethodCall(*(new NIdentifier($1))); $$->line = yylineno; }
+    | Exp LB Exp RB             { $$ = new NListOperator(*$1, *$3); $$->line = $1->line; }
+    | Exp DOT ID                { $$ = new NDotOperator(*$1, *(new NIdentifier($3))); $$->line = $1->line; }
+    | ID                        { $$ = new NIdentifier($1); $$->line = yylineno; }
+    | INT                       { $$ = new NInteger($1); $$->line = yylineno; }
+    | FLOAT                     { $$ = new NFloat($1); $$->line = yylineno; }
+    | CHAR                      { $$ = new NChar($1); $$->line = yylineno; }
+    ;
+Args:   
+    Exp COMMA Args              { $$ = new NArgs(*$1, $3); $$->line = $1->line; }
+    | Exp                       { $$ = new NArgs(*$1, nullptr); $$->line = $1->line; }
+    ;
 
-        | PLUSPLUS Exp %prec UPLUSPLUS   {}//这里利用BISON %prec表示和UMINUS同优先级
-        | MINUSMINUS Exp %prec UMINUSMINUS   {}//这里利用BISON %prec表示和UMINUS同优先级
-        | Exp PLUSPLUS   {}//这里利用BISON %prec表示和UMINUS同优先级
-        | Exp MINUSMINUS  {}//这里利用BISON %prec表示和UMINUS同优先级
-
-        | Exp AND Exp   {}
-        | Exp OR Exp    {}
-        | Exp RELOP Exp {}  //词法分析关系运算符号自身值保存在$2中
-        | Exp PLUS Exp  {}
-        | Exp MINUS Exp {}
-        | Exp STAR Exp  {}
-        | Exp DIV Exp   {}
-        
-        | Exp MOD Exp   {}
-        
-        | LP Exp RP     {}
-        | MINUS Exp %prec UMINUS   {}//这里利用BISON %prec表示和UMINUS同优先级 相当于虚拟出一个运算符
-        | NOT Exp       {}
-        | ID LP Args RP {}
-        | ID LP RP      {}
-        | Exp LB Exp RB {}
-        | Exp DOT ID    {}
-        | ID            {}
-        | INT           {$$=new NInteger($1);$$->line=yylineno;}
-        | FLOAT         {}
-        | CHAR          {}
-        ;
-Args:   Exp COMMA Args {}
-        | Exp {}
-        ;
 
 %%
 // int main(int argc, char *argv[]){
