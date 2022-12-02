@@ -16,15 +16,15 @@ define dso_local i32 @main() #0 {
   br i1 %5, label %6, label %8
 
 6:                                                ; preds = %0
-  %7 = call i32 @putchar(i32 89)
+  %7 = call i32 @putchar(i32 89)    ;Y
   br label %10
 
 8:                                                ; preds = %0
-  %9 = call i32 @putchar(i32 78)
+  %9 = call i32 @putchar(i32 78)    ;N
   br label %10
 
 10:                                               ; preds = %8, %6
-  %11 = call i32 @putchar(i32 10)
+  %11 = call i32 @putchar(i32 10)   ;\n
   store i32 0, i32* %2, align 4
   ret i32 0
 }

@@ -9,11 +9,28 @@ define dso_local i32 @main() #0 {
   %2 = alloca i32, align 4
   store i32 0, i32* %1, align 4
   store i32 1, i32* %2, align 4
-  store i32 72, i32* %2, align 4
+  store i32 72, i32* %2, align 4    ;H
   %3 = load i32, i32* %2, align 4
   %4 = call i32 @putchar(i32 %3)
   ;begin
-
+  store i32 85, i32* %2, align 4    ;U 
+  %5 = load i32, i32* %2, align 4
+  %6 = call i32 @putchar(i32 %5)
+  store i32 83, i32* %2, align 4    ;S
+  %7 = load i32, i32* %2, align 4
+  %8 = call i32 @putchar(i32 %7)
+  store i32 84, i32* %2, align 4    ;T
+  %9 = load i32, i32* %2, align 4
+  %10 = call i32 @putchar(i32 %9)
+  store i32 67, i32* %2, align 4    ;C
+  %11 = load i32, i32* %2, align 4
+  %12 = call i32 @putchar(i32 %11)
+  store i32 83, i32* %2, align 4    ;S
+  %13 = load i32, i32* %2, align 4
+  %14 = call i32 @putchar(i32 %13)
+  store i32 69, i32* %2, align 4    ;E
+  %15 = load i32, i32* %2, align 4
+  %16 = call i32 @putchar(i32 %15)
   ;end
   store i32 10, i32* %2, align 4
   %17 = load i32, i32* %2, align 4
