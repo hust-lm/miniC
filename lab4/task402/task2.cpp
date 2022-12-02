@@ -97,10 +97,56 @@ int main(int argc, char *argv[]) {
   //设置返回类型
   //begin
   
+   //putchar 与 getchar 参数列表
+  std::vector<Value *> argsV;
+  std::vector<Value *> getArgsV;
+  //main函数
+  Type *retType = Type::getInt32Ty(*theContext);
+  std::vector<Type *> argsTypes;     
+  std::vector<std::string> argNames; 
+  FunctionType *ft = FunctionType::get(retType, argsTypes, false);
+  Function *f = Function::Create(ft, Function::ExternalLinkage, "main", theModule.get());
+  //main函数接收参数，设置名字
+  unsigned idx = 0;
+  for (auto &arg : f->args()) {
+    arg.setName(argNames[idx++]);
+  }
+  //创建第一个基本块 函数入口
+  BasicBlock *bb = BasicBlock::Create(*theContext, "entry", f);
+  builder->SetInsertPoint(bb); 
+  
+  AllocaInst *alloca_a = builder->CreateAlloca(Type::getInt32Ty(*theContext), nullptr, "a");
+  Value *callgetchar = builder->CreateCall(getFunc, getArgsV, "callgetchar");
+  builder->CreateStore(callgetchar, alloca_a);
+  Value *load_a = builder->CreateLoad(alloca_a->getAllocatedType(), alloca_a, "a");
+  Value *const_a = ConstantInt::get(*theContext, APInt(32, 'a', true));
+  Value *compare_a_0 = builder->CreateICmpEQ(load_a, const_a, "comp");//比较
+  Value *condVal = builder->CreateICmpNE(compare_a_0, Constant::getNullValue(compare_a_0->getType()), "cond");
+  // 基本块：真，假，继续操作
+  BasicBlock *thenb = BasicBlock::Create(*theContext, "then", f);
+  BasicBlock *elseb = BasicBlock::Create(*theContext, "else", f);
+  BasicBlock *nextb = BasicBlock::Create(*theContext, "next", f);
+  builder->CreateCondBr(condVal, thenb, elseb);
+  // 标记then基本块
+  builder->SetInsertPoint(thenb);
+  Value *const_1 = ConstantInt::get(*theContext, APInt(32, 'Y', true));
+  argsV.clear();
+  argsV.push_back(const_1);
+  builder->CreateCall(putFunc, argsV, "callputchar");
+  builder->CreateBr(nextb);
+  // 标记else基本块
+  builder->SetInsertPoint(elseb);
+  Value *const_2 = ConstantInt::get(*theContext, APInt(32, 'N', true));
+  argsV.clear();
+  argsV.push_back(const_2);
+  builder->CreateCall(putFunc, argsV, "callputchar");
+  builder->CreateBr(nextb);
+  //标记继续操作基本块
+  builder->SetInsertPoint(nextb);
 
   // end
   //设置返回值
-  builder->CreateRet(const_0);
+  builder->CreateRet(const_a);
   verifyFunction(*f);
   // Run the optimizer on the function.
   // theFPM->run(*f);

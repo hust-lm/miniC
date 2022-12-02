@@ -125,6 +125,30 @@ int main(int argc, char *argv[]) {
   Value *callputchar = builder->CreateCall(calleeF, argsV, "callputchar");
   // begin
   
+  Value *const_2 = ConstantInt::get(*theContext, APInt(32, 'U', true));
+  argsV.clear();
+  argsV.push_back(const_2);
+  builder->CreateCall(calleeF, argsV, "callputchar");
+  Value *const_3 = ConstantInt::get(*theContext, APInt(32, 'S', true));
+  argsV.clear();
+  argsV.push_back(const_3);
+  builder->CreateCall(calleeF, argsV, "callputchar");
+  Value *const_4 = ConstantInt::get(*theContext, APInt(32, 'T', true));
+  argsV.clear();
+  argsV.push_back(const_4);
+  builder->CreateCall(calleeF, argsV, "callputchar");
+  Value *const_5 = ConstantInt::get(*theContext, APInt(32, 'C', true));
+  argsV.clear();
+  argsV.push_back(const_5);
+  builder->CreateCall(calleeF, argsV, "callputchar");
+  Value *const_6 = ConstantInt::get(*theContext, APInt(32, 'S', true));
+  argsV.clear();
+  argsV.push_back(const_6);
+  builder->CreateCall(calleeF, argsV, "callputchar");
+  Value *const_7 = ConstantInt::get(*theContext, APInt(32, 'E', true));
+  argsV.clear();
+  argsV.push_back(const_7);
+  builder->CreateCall(calleeF, argsV, "callputchar");
   // end
   //设置返回值
   builder->CreateRet(const_1);

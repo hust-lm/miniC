@@ -10,3 +10,7 @@ tokens.txt
 *.output
 parser.cpp
 parser.hpp
+#402
+tmp
+task1
+task2
