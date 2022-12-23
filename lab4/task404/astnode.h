@@ -213,7 +213,7 @@ public:
   NVarDec(NIdentifier &Id) : Id(Id) {}
   std::string getNodeName() { return "VarDec"; }
   int parse();
-  Value *codegen();
+  Value* codegen(Type* varType, Value* varValue);
 };
 
 class NParamDec : public Node {
@@ -260,6 +260,7 @@ public:
   NDec(NVarDec &vardec, NExpression *exp) : vardec(vardec), exp(exp) {}
   std::string getNodeName() { return "Dec"; }
   int parse();
+  Value* codegen(Type* varType);  // new
 };
 
 class NDecList : public Node {
@@ -269,6 +270,7 @@ public:
   NDecList(NDec &dec, NDecList *nDecList) : dec(dec), nDecList(nDecList) {}
   std::string getNodeName() { return "DecList"; }
   int parse();
+  Value* codegen(Type* varType); // new
 };
 
 class NDef : public Node {
